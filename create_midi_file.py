@@ -33,13 +33,13 @@ def create_midi_file(ensemble, tempo):
             mf.addNote(track, channel, pitch, time, duration, volume)
             time += duration
     
-    savefile(mf)
+    return savefile(mf)
 
 def savefile(mf):
     
     #get filename
     exists, i = False,0
-    dirpath=os.path.dirname(os.path.realpath(__file__)) +'\output_1'
+    dirpath=os.path.dirname(os.path.realpath(__file__)) +'\output_files'
     while exists==False:
         filename=os.path.join(dirpath,'song_{}.mid'.format(i))
         if os.path.exists(filename)==False:
@@ -50,4 +50,4 @@ def savefile(mf):
     with open(filename, 'wb') as outf:
         mf.writeFile(outf)
         
-    print(filename)
+    return filename

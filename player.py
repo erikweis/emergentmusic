@@ -13,7 +13,7 @@ from note_space import Note
 
 class Player():
     
-    def __init__(self, note_space_graph, graph_id):
+    def __init__(self, note_space_graph, graph_id, player_attributes):
         
         """
         Player class
@@ -66,7 +66,16 @@ class Player():
         self.harmonicity_threshold = 1
         self.susceptibility_to_influence = 0.35
     
-    def evolve(self, note_landscape):
+    def evolve(self):
+        
+        """
+        move time steps forward one unit
+        """
+        
+        self.t += 1
+        self.note_duration += 1
+        
+    def decide_to_change(self, note_landscape):
         
         """
         determines whether a player should change note or not
@@ -81,9 +90,6 @@ class Player():
         
         returns True if a change is necessary
         """
-        
-        self.t += 1
-        self.note_duration += 1
         
         #calculate harmonicity score
         harmonicity = self.harmonicity_score(note_landscape)
@@ -147,10 +153,10 @@ class Player():
         """
         
         # choice list of all neighbors of neighbors
-        choice_list = list(self.G[self.note.pitch])
-        for c in range(len(choice_list)):
-            choice_list +=(list(self.G[c]))
-        #choice_list = list(self.G.nodes)
+        #choice_list = list(self.G[self.note.pitch])
+        #for c in range(len(choice_list)):
+        #    choice_list +=(list(self.G[c]))
+        choice_list = list(self.G.nodes)
         
         #determine weights for all choice possibilities
         weights = [0]*len(choice_list)

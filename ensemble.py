@@ -22,7 +22,7 @@ class Ensemble():
         note changes are recognized by a players neighbors
     """
     
-    def __init__(self,G,note_space=None):
+    def __init__(self,G, player_attributes, note_space=None):
         
         #set graph of musicians
         self.G=G
@@ -34,7 +34,7 @@ class Ensemble():
         #node on the player graph G
         player_dict={}
         for node in G.nodes():
-            player_dict[node]= Player(note_space_graph,node)
+            player_dict[node]= Player(note_space_graph,node,player_attributes)
         nx.set_node_attributes(G,player_dict,'player')
     
     def evolve(self, steps = 1):
@@ -63,8 +63,11 @@ class Ensemble():
             landscape_dict[i] = [notes[p] for p in neighbor_dict[i]]
         
         # evolve all players
-        # get list of notes that have changed
-        change_status = [players[i].evolve(landscape_dict[i]) for i in range(len(players))]
+        for player in players:
+            player.evolve()
+            
+        # get list of notes that must be changed
+        change_status = [players[i].decide_to_change(landscape_dict[i]) for i in range(len(players))]
         
         # change all notes needed to be changed
         for i in range(len(players)):
@@ -79,17 +82,26 @@ class Ensemble():
                 # change note
                 neighbor_notes = [notes[p] for p in neighbor_list]
                 players[i].change_note(neighbor_notes)
+    
+    def get_pitch_history_data(self):
         
+        pitch_history_data = []
+        
+        for node in self.G.nodes:
+            pitch_history_data = deepcopy(self.G.nodes[node]['player'].data)
+            
+            pitch_data = []
+            for pitch, volume, duration in pitch_history_data:
+                    pitch_data += [pitch]*duration
+            pitch_history_data.append(pitch_data)
+    
+        return pitch_history_data
+    
     def show_pitch_history(self):
         
         fig=plt.figure(figsize=(6,6), dpi=300)
-        for node in self.G.nodes:
-            data = self.G.nodes[node]['player'].data
-            
-            pitch_data = []
-            for pitch, volume, duration in data:
-                    pitch_data += [pitch]*duration
-            
+        
+        for pitch_data in self.get_pitch_history_data():    
             plt.plot(pitch_data)
             
         plt.show()
