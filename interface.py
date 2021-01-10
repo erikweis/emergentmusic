@@ -13,6 +13,9 @@ from bokeh.io import curdoc, output_notebook, show
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, Slider, TextInput, Button, Select, RangeSlider, Div
 from bokeh.plotting import figure
+from bokeh.palettes import viridis
+
+#--------------------------------------------------
 
 #run button
 run = Button(label="Create MIDI File", button_type="success")
@@ -53,6 +56,38 @@ def graph_type_change(attr, old, new):
     else: rewiring_prob.visible = False
 graph_type.on_change('value', graph_type_change)
 
+#--------------------------------------------------
+
+#make pitch history plot
+blank_data = {'xs':[], 'ys':[], 'color':[]}
+source = ColumnDataSource(blank_data)
+p = figure(plot_width = 800, plot_height = 400)
+p.multi_line(xs = 'xs' ,ys = 'ys', color = 'color', source = source)
+
+#turn off bokeh settings
+p.toolbar.logo=None
+p.toolbar_location=None
+p.toolbar.active_drag = None
+p.toolbar.active_scroll = None
+p.toolbar.active_tap = None
+
+
+# function for updating plot data
+def update_pitch_history_plot(filename, pitch_history_data):
+    
+    song_length = len(pitch_history_data[0])
+    xs = [list(range(song_length)) for _ in pitch_history_data]
+    ys = pitch_history_data
+    
+    #color pallete 
+    palette = viridis(88)
+    color = [palette[data[0]] for data in pitch_history_data] 
+    
+    new_data = {'xs':xs, 'ys':ys, 'color':color}
+    source.data =new_data
+
+#---------------------------------------------------
+
 #button push
 def button_push(event):
     filename, data = create_song(
@@ -64,12 +99,13 @@ def button_push(event):
         player_attributes = None)
     
     run_message.text = filename
+    update_pitch_history_plot(filename, data)
+    
+
     
 run.on_click(button_push)
-    
-    #plot with filename, data
 
-layout = column(row(player_options, column(song_options, graph_options)), column(run,run_message))
+layout = column(row(player_options, column(song_options, graph_options)), column(run,run_message),p)
 
 curdoc().add_root(layout)
 curdoc().title = "Emergent Music"

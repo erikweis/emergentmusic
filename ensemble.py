@@ -85,7 +85,7 @@ class Ensemble():
     
     def get_pitch_history_data(self):
         
-        pitch_history_data = []
+        data = []
         
         for node in self.G.nodes:
             pitch_history_data = deepcopy(self.G.nodes[node]['player'].data)
@@ -93,9 +93,9 @@ class Ensemble():
             pitch_data = []
             for pitch, volume, duration in pitch_history_data:
                     pitch_data += [pitch]*duration
-            pitch_history_data.append(pitch_data)
+            data.append(pitch_data)
     
-        return pitch_history_data
+        return data
     
     def show_pitch_history(self):
         

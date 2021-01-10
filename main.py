@@ -12,7 +12,7 @@ from create_midi_file import create_midi_file
 def create_song(graph_type='Small World',
         average_degree = 4,
         number_of_players = 20,
-        rewiring_prob = None,
+        rewiring_prob = 0.3,
         number_time_steps = 300,
         tempo = 108,
         player_attributes = None):
@@ -38,7 +38,7 @@ def create_song(graph_type='Small World',
     
     #create player graph
     if graph_type == 'Small World':
-        assert rewiring_prob
+        #assert rewiring_prob
         G = nx.watts_strogatz_graph(number_of_players, average_degree, rewiring_prob)
     elif graph_type =='Random':
         pass
