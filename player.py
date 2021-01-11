@@ -13,7 +13,10 @@ from note_space import Note
 
 class Player():
     
-    def __init__(self, note_space_graph, graph_id, player_attributes):
+    def __init__(self, note_space_graph, 
+                 ensemble_graph_id, 
+                 starting_pitch,
+                 player_attributes):
         
         """
         Player class
@@ -25,18 +28,36 @@ class Player():
             net_change: keep track of how far up or down the musican has moved
                 since the first note
             note_space: a Graph object generated as the note space
+            
+        Arguments:
+            player_attributes (dictionary of parameters):
+            - duration: min and max note duration
+            - susceptibility_to_influence: how likely a player is to repsond to a
+                ping from another player
+            - harmonicity_threshold_type: how does a player decide they are out
+                of harmonic balance with their environment:
+                1. learning via a moving average (truncated?)
+                2. fixed value
+            - change_options: when a player decides to change notes, what notes
+                may that player select as a new note
+                1. all notes
+                2. neighbors of neighbors
+                3. neighbors
         """
         
-        # best
-        self.id = graph_id
+        # record the id (integer) that corresponds to the node name where
+        # the player is stored
+        self.id = ensemble_graph_id
         
         #restrict the starting pitches to the center of the range
-        std=15
-        a , b = (-24)/std, (32)/std 
-        starting_pitch=int(truncnorm.rvs(a,b,loc=44,scale=std))
+        if starting_pitch == 'random':
+            std=15
+            a , b = (-24)/std, (32)/std 
+            starting_pitch=int(truncnorm.rvs(a,b,loc=44,scale=std))
+        self.starting_pitch = starting_pitch
         
         #set note
-        self.note=Note(starting_pitch,volume=80)
+        self.note=Note(self.starting_pitch,volume=80)
         
         #start the clock and all time stuff
         self.t = 0
@@ -56,15 +77,17 @@ class Player():
         #store note space graph
         self.G = note_space_graph
         
-        #off velocity
+        #note parameters
         self.off_velocity = 127
-        self.min_duration = 3
-        self.max_duration = 300
+        self.min_duration = player_attributes['duration'][0]
+        self.max_duration = player_attributes['duration'][0]
         
         #harmonicity threshold
+        self.harmonicity_threshold_type = player_attributes['harmonicity_threshold_type']
         self.harmonicity_data = []
-        self.harmonicity_threshold = 1
-        self.susceptibility_to_influence = 0.35
+        self.harmonicity_threshold = player_attributes['harmonicity_threshold']
+        
+        self.susceptibility_to_influence = player_attributes['susceptibility_to_influence']
     
     def evolve(self):
         
@@ -172,6 +195,9 @@ class Player():
             choices=[i for i in choices if i[0]>=self.note.pitch]
         elif self.net_change >= 12:
             choices=[i for i in choices if i[0]<=self.note.pitch]
+        
+        #restrict range to three octaves
+        choices = [i for i in choices if self.starting_pitch -18 <= i[0] <= self.starting_pitch + 18]
         
         choice_list , weights = [c for c,w in choices], [w for c,w, in choices]
         new_pitch = random.choices(choice_list, weights=weights)[0]

@@ -22,10 +22,11 @@ class Ensemble():
         note changes are recognized by a players neighbors
     """
     
-    def __init__(self,G, player_attributes, note_space=None):
+    def __init__(self,G, player_attributes, note_space=None,):
         
         #set graph of musicians
         self.G=G
+        starting_pitches = nx.get_node_attributes(G,'starting_pitch')
         
         #create a NodeSpace Object if nonexistent
         note_space_graph = NoteSpace().projected_graph()
@@ -34,7 +35,8 @@ class Ensemble():
         #node on the player graph G
         player_dict={}
         for node in G.nodes():
-            player_dict[node]= Player(note_space_graph,node,player_attributes)
+            player_dict[node]= Player(note_space_graph,node,
+                                      starting_pitches[node],player_attributes)
         nx.set_node_attributes(G,player_dict,'player')
     
     def evolve(self, steps = 1):
@@ -105,7 +107,17 @@ class Ensemble():
             plt.plot(pitch_data)
             
         plt.show()
+    
+    def get_harmonicity_data(self):
         
+        data = []
+        
+        for node in self.G.nodes:
+            temp_data = deepcopy(self.G.nodes[node]['player'].harmonicity_data)
+            data.append(temp_data)
+    
+        return data
+    
     def finish(self):
         
         """
