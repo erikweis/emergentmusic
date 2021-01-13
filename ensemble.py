@@ -35,7 +35,7 @@ class Ensemble():
         #node on the player graph G
         player_dict={}
         for node in G.nodes():
-            player_dict[node]= Player(note_space_graph,node,
+            player_dict[node]= Player(note_space_graph,node,G.degree[node],
                                       starting_pitches[node],player_attributes)
         nx.set_node_attributes(G,player_dict,'player')
     

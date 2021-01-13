@@ -15,6 +15,7 @@ class Player():
     
     def __init__(self, note_space_graph, 
                  ensemble_graph_id, 
+                 degree,
                  starting_pitch,
                  player_attributes):
         
@@ -36,7 +37,7 @@ class Player():
                 ping from another player
             - harmonicity_threshold_type: how does a player decide they are out
                 of harmonic balance with their environment:
-                1. learning via a moving average (truncated?)
+                1. learning via a (truncated?)
                 2. fixed value
             - change_options: when a player decides to change notes, what notes
                 may that player select as a new note
@@ -48,6 +49,7 @@ class Player():
         # record the id (integer) that corresponds to the node name where
         # the player is stored
         self.id = ensemble_graph_id
+        self.degree = degree
         
         #restrict the starting pitches to the center of the range
         if starting_pitch == 'random':
@@ -88,6 +90,9 @@ class Player():
         self.harmonicity_threshold = player_attributes['harmonicity_threshold']
         
         self.susceptibility_to_influence = player_attributes['susceptibility_to_influence']
+    
+        #change options
+        self.change_options = player_attributes['change_options']
     
     def evolve(self):
         
@@ -130,7 +135,7 @@ class Player():
                 return False
         elif self.note_duration >= self.max_duration:
             return True
-        elif harmonicity < avg_harmonicity:
+        elif harmonicity < self.harmonicity_threshold*avg_harmonicity:
             return True
         else:
             return False
@@ -176,10 +181,14 @@ class Player():
         """
         
         # choice list of all neighbors of neighbors
-        #choice_list = list(self.G[self.note.pitch])
-        #for c in range(len(choice_list)):
-        #    choice_list +=(list(self.G[c]))
-        choice_list = list(self.G.nodes)
+        if self.change_options == 'Neighbors of Neighbors':
+            choice_list = list(self.G[self.note.pitch])
+            for c in range(len(choice_list)):
+                choice_list +=(list(self.G[c]))
+        elif self.change_options == 'All':
+            choice_list = list(self.G.nodes)
+        else:
+            pass
         
         #determine weights for all choice possibilities
         weights = [0]*len(choice_list)
@@ -222,5 +231,5 @@ class Player():
             if self.G.has_edge(pitch,note.pitch):
                 score += self.G[pitch][note.pitch]["weight"]
         
-        return score
+        return score/self.degree
             

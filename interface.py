@@ -24,23 +24,23 @@ run_message = Div(text = "")
 #player options
 div_player_options = Div(text = """<h2>Player Options</h2>""")
 susceptibility_to_influence = Slider(title = "Susceptibility to Influence", start = 0, end = 1, value = 0.35, step = 0.05)
-duration = RangeSlider(start = 1, end = 200, value = (5,100), step = 1, title = "Note Duration")
+duration = RangeSlider(start = 1, end = 200, value = (20,37), step = 1, title = "Note Duration")
 harmonicity = Select (title = "Harmonicity Theshold Type", value = "Fixed", options = ["Fixed", "Moving Average"] )
 harmonicity_fixed = Slider(title = "Fixed Harmonicity Threshold", value = 1, start = 0, end = 10, step = 0.05)
-harmonicity_average = Slider(title = "Moving Average (%)", value = 0.5, start = 0, end = 1, step = 0.05)
+harmonicity_average = Slider(title = "Moving Average (%)", value = 0.5, start = 0, end = 2, step = 0.05)
 change_options = Select (title = "Note Change Choices", value = "All", options = ["All", "Neighbors", "Neighbors of Neighbors"])
 player_options = column(div_player_options, duration, change_options, harmonicity, harmonicity_fixed, harmonicity_average, susceptibility_to_influence)
 
 #song options
 div_song_options = Div(text = """<h2>Song Options</h2>""")
 number_players = Slider(title = "Number of Players", value = 20, start = 2, end = 40)
-number_time_steps = Slider(title = "Song Length", value = 300, start = 100, end = 1000, step =10) 
+number_time_steps = Slider(title = "Song Length", value = 300, start = 100, end = 2000, step =10) 
 song_options = column(div_song_options, number_players, number_time_steps)
 
 #graph options
 div_graph_options = Div(text = """<h2>Graph Options </h2>""")
 graph_type = Select(title = "Graph Type", value = "Small World", options = ["Random", "Small World", "Structured"])
-average_degree = Slider(title = "Average Degree", value = 4, start = 1, end = number_players.value  , step = 0.5) 
+average_degree = Slider(title = "Average Degree", value = 10, start = 1, end = number_players.value  , step = 1) 
 rewiring_prob = Slider(title = "Rewiring Probability", start = 0, end = 1, value = 0.3, step = 0.05, visible = (graph_type.value == "Small World"))
 graph_options = column (div_graph_options, graph_type, average_degree, rewiring_prob)
 
@@ -175,6 +175,7 @@ def button_push(event):
     filename, pitch_data, harmonicity_data = create_song(
         graph_attributes = graph_attributes,
         number_time_steps = number_time_steps.value,
+        number_players = number_players.value,
         tempo = 108,
         player_attributes = player_attributes)
     
