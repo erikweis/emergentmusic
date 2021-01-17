@@ -101,6 +101,7 @@ q.toolbar_location=None
 q.toolbar.active_drag = None
 q.toolbar.active_scroll = None
 q.toolbar.active_tap = None
+q.axis.major_label_text_color = 'black'
 
 def update_harmonicity_plot(harmonicity_data):
     
@@ -192,7 +193,7 @@ right_column = column(p,q)
 layout = row(left_column,right_column)
 
 curdoc().add_root(layout)
-curdoc().title = "Emergent Music"
+curdoc().title = "Emergent    "
 
 #output_notebook(hide_banner = True)
 #show(layout,notebook_handle=True)

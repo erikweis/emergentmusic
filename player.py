@@ -59,7 +59,7 @@ class Player():
         self.starting_pitch = starting_pitch
         
         #set note
-        self.note=Note(self.starting_pitch,volume=80)
+        self.note=Note(self.starting_pitch,volume=30)
         
         #start the clock and all time stuff
         self.t = 0
@@ -158,8 +158,8 @@ class Player():
         old_pitch = self.note.pitch
         
         #get new pitch and set new note
-        new_pitch = self.get_new_pitch(note_list)
-        self.note = Note(new_pitch,self.note.volume)
+        new_pitch, new_volume = self.get_new_pitch(note_list)
+        self.note = Note(new_pitch,new_volume)
         
         #update net change
         self.net_change += new_pitch - old_pitch
@@ -178,6 +178,10 @@ class Player():
         the note choice could be based on:
             the subgraph of the note selection aligns with the others currently
             another standout harmonic series
+            
+        the new note volume is based on the harmonicity score of the new pitch
+            which is normalized to a "max harmonicity score" of 2 (arbitrary guess)
+            
         """
         
         # choice list of all neighbors of neighbors
@@ -187,6 +191,9 @@ class Player():
                 choice_list +=(list(self.G[c]))
         elif self.change_options == 'All':
             choice_list = list(self.G.nodes)
+            #remove current note
+            choice_list = [c for c in choice_list if c!=self.note.pitch]
+            
         else:
             pass
         
@@ -210,8 +217,10 @@ class Player():
         
         choice_list , weights = [c for c,w in choices], [w for c,w, in choices]
         new_pitch = random.choices(choice_list, weights=weights)[0]
+        new_volume = self.harmonicity_score(note_landscape, new_pitch)*120/2
+        new_volume = max(30,round(new_volume))
         
-        return new_pitch
+        return new_pitch, new_volume
     
     def harmonicity_score(self, note_landscape, pitch=None):
         
@@ -227,9 +236,15 @@ class Player():
         
         score = 0
         
+        #weight each score component by the weight in notespace, multiplied
+        # by the volume. essentially, louder nodes contribute more to the score
+        #volumes are normalized to the max volume of 120
+        # note that a player with quiet neighbors will have a lower harmonicity score
+        #this has the added effect that notes will not pop out of there local texture
+        # i.e. players only have permission to play loud when their neighbors do
         for note in note_landscape:
             if self.G.has_edge(pitch,note.pitch):
-                score += self.G[pitch][note.pitch]["weight"]
+                score += self.G[pitch][note.pitch]["weight"]*note.volume/120
         
         return score/self.degree
             

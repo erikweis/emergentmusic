@@ -42,6 +42,7 @@ def savefile(mf):
     dirpath=os.path.dirname(os.path.realpath(__file__)) +'\output_files'
     while exists==False:
         filename=os.path.join(dirpath,'song_{}.mid'.format(i))
+        filename_data = os.path.join(dirpath,'song_{}.txt'.format(i))
         if os.path.exists(filename)==False:
             exists=True
         else: i+=1

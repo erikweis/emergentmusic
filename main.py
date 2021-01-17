@@ -9,6 +9,14 @@ from ensemble import Ensemble
 import networkx as nx
 from create_midi_file import create_midi_file
 
+def create_data_file(filename,data1,data2):
+    
+    #write data file
+    with open(filename, 'w') as out:
+        out.write(str(data1))
+        out.write('\n')
+        out.write(str(data2))
+
 def create_song(graph_attributes = {'graph_type':'Small World',
                                     'average_degree':4,
                                     'rewiring_prob':0.3},
@@ -64,6 +72,8 @@ def create_song(graph_attributes = {'graph_type':'Small World',
     
     #create file
     filename = create_midi_file(ensemble,tempo)    
+    create_data_file(filename.replace('.mid','.txt'),
+                     pitch_history_data,harmonicity_data)
 
     return filename, pitch_history_data, harmonicity_data
 
