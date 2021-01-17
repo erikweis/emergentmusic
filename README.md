@@ -10,4 +10,17 @@ This project simulates a group of musicians whose only goal is to maximize the "
 
 Musicians are positioned on a graph, and listen only to their neighbors. The graph can take any shape, and the structure of that graph seems to play an important role in what kind of music is produced. Musicians evaluate their currently played note based on that note's proximity to those they hear in *note space*. The note space is created via a bipartite graph of notes and fundamental harmonic series and projecting onto the notes. A notes tie strength to each harmonic series is stronger when that note is a lower harmonic, i.e. an octave, fifth, fourth, or third. Musicians decide to change notes based on some probabilistic parameters, including how well their note fits in with what they here.
 
+## How to Use the Interface
+
+Clone the repository, and then in the command line, run the following.
+
+```
+bokeh serve interface.py
+```
+You can adjust the parameters of the model, though some are not functional. 
+
+[](./interface.png)
+
+## Examples
+
 For some examples, see www.erikweis.com/music. To run, you will need MIDIUtil and networkx, and the simulation outputs a midi file.
