@@ -19,7 +19,7 @@ bokeh serve interface.py
 ```
 You can adjust the parameters of the model, though some are not functional. 
 
-[](./interface.png)
+![](./interface.png)
 
 ## Examples
 
