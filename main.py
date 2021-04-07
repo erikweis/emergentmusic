@@ -2,7 +2,6 @@
 """
 Created on Fri Jan  8 12:38:15 2021
 
-@author: Erik
 """
 
 from ensemble import Ensemble
